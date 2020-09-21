@@ -23,7 +23,7 @@ valid file path. For example:
 
 ```
 bash delimit.sh peano.mm
-clang++ -std=c++2a -fconstexpr-steps=2147483647 -I /path/to/cest/include checkmm.cpp -DMMFILEPATH=peano.mm.raw
+clang++ -std=c++2a -fconstexpr-steps=2147483647 -I /path/to/cest/include ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
 ```
 
 Successful compilation indicates that the Metamath database was verified.
