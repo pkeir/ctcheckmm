@@ -15,10 +15,7 @@
 // compile the program with MMFILEPATH defined as the path to a file containing
 // a Metamath database encoded as a C++11 style raw string literal. The
 // trivial delimit.sh bash script is provided to help convert database files to
-// this format. The C'est library is at https://github.com/pkeir/cest
-
-// bash delimit.sh peano.mm
-// clang++ -std=c++2a -fconstexpr-steps=2147483647 -I $CEST_INCLUDE ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
+// this format.
 
 #include "cest/algorithm.hpp"
 #include "cest/cctype.hpp"
@@ -1364,43 +1361,3 @@ constexpr int run(ns::string const filename, ns::string const &text = "")
 }
 
 }; // struct checkmm
-
-#define xstr(s) str(s)
-#define str(s) #s
-
-constexpr int app_run()
-{
-    checkmm app;
-//    ns::string txt = R"($( Declare the constant symbols we will use $)
-//                        $c 0 + = -> ( ) term wff |- $.)";
-//    ns::string txt = "$c 0 + = -> ( ) term wff |- $.";
-//    ns::string txt = "$( The comment is not closed!";
-
-#ifdef MMFILEPATH
-    ns::string txt =
-#include xstr(MMFILEPATH)
-;
-    int ret = app.run("", txt);
-#else
-    int ret = EXIT_SUCCESS;
-#endif
-
-    return ret;
-}
-
-int main(int argc, char ** argv)
-{
-    if (argc != 2)
-    {
-        ns::cerr << "Syntax: checkmm <filename>" << ns::endl;
-        return EXIT_FAILURE;
-    }
-
-    static_assert(EXIT_SUCCESS == app_run());
-
-    checkmm app;
-    int ret = app.run(argv[1]);
-
-    return ret;
-}
-
