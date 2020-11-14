@@ -30,10 +30,20 @@ constexpr int basic_checkmm_test()
   return app.run("", txt);
 }
 
-int main(int argc, char *argv[])
-{
-  static_assert(EXIT_SUCCESS == basic_checkmm_test());
-  static_assert(EXIT_SUCCESS == run_checkmm());
+static_assert(EXIT_SUCCESS == basic_checkmm_test());
 
-  return 0;
-}
+int main(int argc, char ** argv)                                                
+{                                                                               
+  if (argc != 2)                                                              
+  {                                                                           
+      ns::cerr << "Syntax: checkmm <filename>" << ns::endl;                   
+      return EXIT_FAILURE;                                                    
+  }                                                                           
+                                                                              
+  static_assert(EXIT_SUCCESS == run_checkmm());
+                                                                              
+  checkmm app;                                                                
+  int ret = app.run(argv[1]);                                                 
+                                                                              
+  return ret;                                                                 
+} 
