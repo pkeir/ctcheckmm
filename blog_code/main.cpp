@@ -30,7 +30,7 @@ int main(int argc, char ** argv)
 {                                                                               
   if (argc != 2)                                                              
   {                                                                           
-    ns::cerr << "Syntax: checkmm <filename>" << ns::endl;                   
+    cest::cerr << "Syntax: checkmm <filename>" << cest::endl;                   
     return EXIT_FAILURE;                                                    
   }                                                                           
                                                                               
