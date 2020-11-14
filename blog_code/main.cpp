@@ -6,21 +6,15 @@
 constexpr int run_checkmm()
 {
   checkmm app;
-//    ns::string txt = R"($( Declare the constant symbols we will use $)
-//                        $c 0 + = -> ( ) term wff |- $.)";
-//    ns::string txt = "$c 0 + = -> ( ) term wff |- $.";
-//    ns::string txt = "$( The comment is not closed!";
 
 #ifdef MMFILEPATH
   cest::string txt =
 #include xstr(MMFILEPATH)
 ;
-  int ret = app.run("", txt);
+  return app.run("", txt);
 #else
-  int ret = EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 #endif
-
-  return ret;
 }
 
 constexpr int basic_checkmm_test()
@@ -36,8 +30,8 @@ int main(int argc, char ** argv)
 {                                                                               
   if (argc != 2)                                                              
   {                                                                           
-      ns::cerr << "Syntax: checkmm <filename>" << ns::endl;                   
-      return EXIT_FAILURE;                                                    
+    ns::cerr << "Syntax: checkmm <filename>" << ns::endl;                   
+    return EXIT_FAILURE;                                                    
   }                                                                           
                                                                               
   static_assert(EXIT_SUCCESS == run_checkmm());
