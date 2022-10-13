@@ -22,6 +22,7 @@ string) file in; as a `cest::string`. This happens if `MMFILEPATH` is set to a
 valid file path. For example:
 
 ```
+wget https://raw.githubusercontent.com/metamath/set.mm/develop/peano.mm
 bash delimit.sh peano.mm
 clang++ -std=c++20 -fconstexpr-steps=2147483647 -I /path/to/cest/include ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
 ```
@@ -30,8 +31,9 @@ With GCC, a recent version is required (e.g. GCC 12), and a different switch
 enables a non-default `constexpr` operation count limit:
 
 ```
-sudo apt-get install g++-12
+wget https://raw.githubusercontent.com/metamath/set.mm/develop/peano.mm
 bash delimit.sh peano.mm
+sudo apt-get install g++-12
 g++-12 -std=c++20 -fconstexpr-ops-limit=2147483647 -I /path/to/cest/include ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
 ```
 

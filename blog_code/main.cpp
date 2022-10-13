@@ -26,18 +26,18 @@ constexpr int basic_checkmm_test()
 
 static_assert(EXIT_SUCCESS == basic_checkmm_test());
 
-int main(int argc, char ** argv)                                                
-{                                                                               
-  if (argc != 2)                                                              
-  {                                                                           
-    cest::cerr << "Syntax: checkmm <filename>" << cest::endl;                   
-    return EXIT_FAILURE;                                                    
-  }                                                                           
-                                                                              
+int main(int argc, char ** argv)
+{
+  if (argc != 2)
+  {
+    cest::cerr << "Syntax: checkmm <filename>" << cest::endl;
+    return EXIT_FAILURE;
+  }
+
   static_assert(EXIT_SUCCESS == run_checkmm());
-                                                                              
-  checkmm app;                                                                
-  int ret = app.run(argv[1]);                                                 
-                                                                              
-  return ret;                                                                 
-} 
+
+  checkmm app;
+  int ret = app.run(argv[1]);
+
+  return ret;
+}

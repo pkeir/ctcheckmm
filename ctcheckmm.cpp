@@ -17,8 +17,14 @@
 // trivial delimit.sh bash script is provided to help convert database files to
 // this format. The C'est library is at https://github.com/pkeir/cest
 
+// wget https://raw.githubusercontent.com/metamath/set.mm/develop/peano.mm
 // bash delimit.sh peano.mm
-// clang++ -std=c++2a -fconstexpr-steps=2147483647 -I $CEST_INCLUDE ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
+
+// clang++ -std=c++2a -fconstexpr-steps=2147483647     -I $CEST_INCLUDE ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
+
+// or...
+// sudo apt-get install g++-12
+// g++-12  -std=c++20 -fconstexpr-ops-limit=2147483647 -I $CEST_INCLUDE ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
 
 #include "cest/algorithm.hpp"
 #include "cest/cctype.hpp"
