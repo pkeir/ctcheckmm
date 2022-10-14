@@ -34,8 +34,9 @@ enables a non-default `constexpr` operation count limit:
 wget https://raw.githubusercontent.com/metamath/set.mm/develop/peano.mm
 bash delimit.sh peano.mm
 sudo apt-get install g++-12
-g++-12 -std=c++20 -fconstexpr-ops-limit=2147483647 -I $CEST_INCLUDE ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
+g++-12 -std=c++20 -fconstexpr-ops-limit=2147483647 -fconstexpr-loop-limit=2147483647 -I $CEST_INCLUDE ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
 ```
 
 Successful compilation (with either compiler) indicates that the Metamath
-database was verified.
+database was verified. The `wget` commands above relate to the
+[](https://github.com/metamath/set.mm) repository.
