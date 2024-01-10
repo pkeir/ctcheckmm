@@ -20,29 +20,29 @@
 // wget https://raw.githubusercontent.com/metamath/set.mm/develop/peano.mm
 // bash delimit.sh peano.mm
 
-// clang++ -std=c++2a -fconstexpr-steps=2147483647 -I $CEST_INCLUDE ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
+// clang++ -std=c++2a -I $CEST_INCLUDE ctcheckmm.cpp -fconstexpr-steps=2147483647 -DMMFILEPATH=peano.mm.raw
 
 // or...
 // sudo apt-get install g++-12
-// g++-12 -std=c++20 -fconstexpr-ops-limit=2147483647 -fconstexpr-loop-limit=2147483647 -I $CEST_INCLUDE ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
+// g++-12 -std=c++20 -I $CEST_INCLUDE -fconstexpr-ops-limit=2147483647 -fconstexpr-loop-limit=2147483647 ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
 
-#include "cest/algorithm.hpp"
-#include "cest/cctype.hpp"
-#include "cest/cstdlib.hpp"
-#include "cest/deque.hpp"
-#include "cest/fstream.hpp"
-#include "cest/sstream.hpp"
-#include "cest/iostream.hpp"
-#include "cest/iterator.hpp"
-#include "cest/limits.hpp"
-#include "cest/map.hpp"
-#include "cest/queue.hpp"
-#include "cest/set.hpp"
-#include "cest/string.hpp"
-#include "cest/vector.hpp"
-#include "cest/utility.hpp"
+#include <algorithm>
+#include <cctype>
+#include <cstdlib>
+#include <deque>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <iterator>
+#include <limits>
+#include <map>
+#include <queue>
+#include <set>
+#include <string>
+#include <vector>
+#include <utility>
 
-namespace ns = cest;
+namespace ns = std;
 
 struct checkmm
 {
