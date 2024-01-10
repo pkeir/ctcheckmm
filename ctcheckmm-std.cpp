@@ -6,7 +6,7 @@
 //
 // http://creativecommons.org/publicdomain/zero/1.0/
 //
-// This is a C++20 standalone verifier for Metamath database files based on
+// This is a C++23 standalone verifier for Metamath database files based on
 // Eric Schmidt's original version (available at
 // http://us.metamath.org/downloads/checkmm.cpp).
 
@@ -20,11 +20,10 @@
 // wget https://raw.githubusercontent.com/metamath/set.mm/develop/peano.mm
 // bash delimit.sh peano.mm
 
-// clang++ -std=c++2a -I $CEST_INCLUDE ctcheckmm.cpp -fconstexpr-steps=2147483647 -DMMFILEPATH=peano.mm.raw
+//     g++ -std=c++23 -Winvalid-constexpr -Wl,-rpath,"$CEST2_ROOT/lib64:$LD_LIBRARY_PATH" -I $CEST2_ROOT/constexpr-std-headers/include/c++/14.0.0 -I $CEST2_ROOT/constexpr-std-headers/include/c++/14.0.0/x86_64-pc-linux-gnu -L $CEST2_ROOT/lib64 -D_GLIBCXX_CEST_CONSTEXPR=constexpr -D_GLIBCXX_CEST_VERSION=1 -fsanitize=address -static-libasan -fconstexpr-ops-limit=2147483647 -fconstexpr-loop-limit=2147483647 -static-libasan -DMMFILEPATH=peano.mm.raw ctcheckmm-std.cpp
 
 // or...
-// sudo apt-get install g++-12
-// g++-12 -std=c++20 -I $CEST_INCLUDE -fconstexpr-ops-limit=2147483647 -fconstexpr-loop-limit=2147483647 ctcheckmm.cpp -DMMFILEPATH=peano.mm.raw
+// clang++ -std=c++2b -Winvalid-constexpr -Wl,-rpath,"$CEST2_ROOT/lib64:$LD_LIBRARY_PATH" -I $CEST2_ROOT/constexpr-std-headers/include/c++/14.0.0 -I $CEST2_ROOT/constexpr-std-headers/include/c++/14.0.0/x86_64-pc-linux-gnu -L $CEST2_ROOT/lib64 -D_GLIBCXX_CEST_CONSTEXPR=constexpr -D_GLIBCXX_CEST_VERSION=1 -fsanitize=address -fconstexpr-steps=2147483647 -DMMFILEPATH=peano.mm.raw ctcheckmm-std.cpp
 
 #include <algorithm>
 #include <cctype>
