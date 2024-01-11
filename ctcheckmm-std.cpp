@@ -41,51 +41,49 @@
 #include <vector>
 #include <utility>
 
-namespace ns = std;
-
 struct checkmm
 {
 
-ns::queue<ns::string> tokens;
+std::queue<std::string> tokens;
 
-ns::set<ns::string> constants;
+std::set<std::string> constants;
 
-typedef ns::vector<ns::string> Expression;
+typedef std::vector<std::string> Expression;
 
 // The first parameter is the statement of the hypothesis, the second is
 // true iff the hypothesis is floating.
-typedef ns::pair<Expression, bool> Hypothesis;
+typedef std::pair<Expression, bool> Hypothesis;
 
-ns::map<ns::string, Hypothesis> hypotheses;
+std::map<std::string, Hypothesis> hypotheses;
 
-ns::set<ns::string> variables;
+std::set<std::string> variables;
 
 // An axiom or a theorem.
 struct Assertion
 {
     // Hypotheses of this axiom or theorem.
-    ns::deque<ns::string> hypotheses;
-    ns::set<ns::pair<ns::string, ns::string> > disjvars;
+    std::deque<std::string> hypotheses;
+    std::set<std::pair<std::string, std::string> > disjvars;
     // Statement of axiom or theorem.
     Expression expression;
 };
 
-ns::map<ns::string, Assertion> assertions;
+std::map<std::string, Assertion> assertions;
 
 struct Scope
 {
-    ns::set<ns::string> activevariables;
+    std::set<std::string> activevariables;
     // Labels of active hypotheses
-    ns::vector<ns::string> activehyp;
-    ns::vector<ns::set<ns::string> > disjvars;
+    std::vector<std::string> activehyp;
+    std::vector<std::set<std::string> > disjvars;
     // Map from variable to label of active floating hypothesis
-    ns::map<ns::string, ns::string> floatinghyp;
+    std::map<std::string, std::string> floatinghyp;
 };
 
-ns::vector<Scope> scopes;
+std::vector<Scope> scopes;
 
 // Determine if a string is used as a label
-inline constexpr bool labelused(ns::string const label)
+constexpr bool labelused(std::string const label)
 {
     return hypotheses.find(label) != hypotheses.end()
         || assertions.find(label) != assertions.end();
@@ -93,24 +91,24 @@ inline constexpr bool labelused(ns::string const label)
 
 // Find active floating hypothesis corresponding to variable, or empty string
 // if there isn't one.
-constexpr ns::string getfloatinghyp(ns::string const var)
+constexpr std::string getfloatinghyp(std::string const var)
 {
-    for (ns::vector<Scope>::const_iterator iter(scopes.begin());
+    for (std::vector<Scope>::const_iterator iter(scopes.begin());
          iter != scopes.end(); ++iter)
     {
-        ns::map<ns::string, ns::string>::const_iterator const loc
+        std::map<std::string, std::string>::const_iterator const loc
             (iter->floatinghyp.find(var));
         if (loc != iter->floatinghyp.end())
             return loc->second;
     }
 
-    return ns::string();
+    return std::string();
 }
 
 // Determine if a string is an active variable.
-constexpr bool isactivevariable(ns::string const str)
+constexpr bool isactivevariable(std::string const str)
 {
-    for (ns::vector<Scope>::const_iterator iter(scopes.begin());
+    for (std::vector<Scope>::const_iterator iter(scopes.begin());
          iter != scopes.end(); ++iter)
     {
         if (iter->activevariables.find(str) != iter->activevariables.end())
@@ -120,12 +118,12 @@ constexpr bool isactivevariable(ns::string const str)
 }
 
 // Determine if a string is the label of an active hypothesis.
-constexpr bool isactivehyp(ns::string const str)
+constexpr bool isactivehyp(std::string const str)
 {
-    for (ns::vector<Scope>::const_iterator iter(scopes.begin());
+    for (std::vector<Scope>::const_iterator iter(scopes.begin());
          iter != scopes.end(); ++iter)
     {
-        if (ns::find(iter->activehyp.begin(), iter->activehyp.end(), str)
+        if (std::find(iter->activehyp.begin(), iter->activehyp.end(), str)
             != iter->activehyp.end())
             return true;
     }
@@ -134,14 +132,14 @@ constexpr bool isactivehyp(ns::string const str)
 
 // Determine if there is an active disjoint variable restriction on
 // two different variables.
-constexpr bool isdvr(ns::string var1, ns::string var2)
+constexpr bool isdvr(std::string var1, std::string var2)
 {
     if (var1 == var2)
         return false;
-    for (ns::vector<Scope>::const_iterator iter(scopes.begin());
+    for (std::vector<Scope>::const_iterator iter(scopes.begin());
          iter != scopes.end(); ++iter)
     {
-        for (ns::vector<ns::set<ns::string> >::const_iterator iter2
+        for (std::vector<std::set<std::string> >::const_iterator iter2
             (iter->disjvars.begin()); iter2 != iter->disjvars.end(); ++iter2)
         {
             if (   iter2->find(var1) != iter2->end()
@@ -153,47 +151,47 @@ constexpr bool isdvr(ns::string var1, ns::string var2)
 }
 
 // Determine if a character is white space in Metamath.
-inline constexpr bool ismmws(char const ch)
+constexpr bool ismmws(char const ch)
 {
     // This doesn't include \v ("vertical tab"), as the spec omits it.
     return ch == ' ' || ch == '\n' || ch == '\t' || ch == '\f' || ch == '\r';
 }
 
 // Determine if a token is a label token.
-constexpr bool islabeltoken(ns::string const token)
+constexpr bool islabeltoken(std::string const token)
 {
-    for (ns::string::const_iterator iter(token.begin()); iter != token.end();
+    for (std::string::const_iterator iter(token.begin()); iter != token.end();
          ++iter)
     {
         unsigned char const ch(*iter);
-        if (!(ns::isalnum(ch) || ch == '.' || ch == '-' || ch == '_'))
+        if (!(std::isalnum(ch) || ch == '.' || ch == '-' || ch == '_'))
             return false;
     }
     return true;
 }
 
 // Determine if a token is a math symbol token.
-inline constexpr bool ismathsymboltoken(ns::string const token)
+constexpr bool ismathsymboltoken(std::string const token)
 {
-    return token.find('$') == ns::string::npos;
+    return token.find('$') == std::string::npos;
 }
 
 // Determine if a token consists solely of upper-case letters or question marks
-constexpr bool containsonlyupperorq(ns::string token)
+constexpr bool containsonlyupperorq(std::string token)
 {
-    for (ns::string::const_iterator iter(token.begin()); iter != token.end();
+    for (std::string::const_iterator iter(token.begin()); iter != token.end();
          ++iter)
     {
-        if (!ns::isupper(*iter) && *iter != '?')
+        if (!std::isupper(*iter) && *iter != '?')
             return false;
     }
     return true;
 }
 
-constexpr ns::string nexttoken(ns::istream & input)
+constexpr std::string nexttoken(std::istream & input)
 {
     char ch;
-    ns::string token;
+    std::string token;
 
     // Skip whitespace
     while (input.get(ch) && ismmws(ch)) { }
@@ -205,39 +203,32 @@ constexpr ns::string nexttoken(ns::istream & input)
     {
         if (ch < '!' || ch > '~')
         {
-            ns::cerr << "Invalid character read with code 0x";
-            ns::cerr << ns::hex << (unsigned int)(unsigned char)ch
-                      << ns::endl;
-            return ns::string();
+            std::cerr << "Invalid character read with code 0x";
+            std::cerr << std::hex << (unsigned int)(unsigned char)ch
+                      << std::endl;
+            return std::string();
         }
 
         token += ch;
     }
 
     if (!input.eof() && input.fail())
-        return ns::string();
+        return std::string();
 
     return token;
 }
 
-//   http://eel.is/c++draft/dcl.constexpr#3.5
-// The definition of a constexpr function shall satisfy the following
-// requirements: 
-//  - its function-body shall not enclose ([stmt.pre]) 
-//    ...
-//    - a definition of a variable of non-literal type or of static or
-//      thread storage duration.
-ns::set<ns::string> names;
+std::set<std::string> names;
 
-constexpr bool readtokens(ns::string filename, ns::string const &text = "")
+constexpr bool readtokens(std::string filename, std::string const &text = "")
 {
-    //static ns::set<ns::string> names;
+    //static std::set<std::string> names;
 
     bool const alreadyencountered(!names.insert(filename).second);
     if (alreadyencountered)
         return true;
 
-    ns::istringstream in;
+    std::istringstream in;
 
     if (!text.empty())
     {
@@ -245,27 +236,21 @@ constexpr bool readtokens(ns::string filename, ns::string const &text = "")
     }
     else
     {
-        bool okay = [&]() // lambda: non-literal values in dead constexpr paths
+        std::ifstream file(filename.c_str());
+        if (!file)
         {
-            ns::ifstream file(filename.c_str());
-            if (!file)
-                return false;
-            ns::string str((ns::istreambuf_iterator(file)), {});
-            in.str(str);
-            return true;
-        }();
-        if (!okay)
-        {
-            ns::cerr << "Could not open " << filename << ns::endl;
+            std::cerr << "Could not open " << filename << std::endl;
             return false;
         }
+        std::string str((std::istreambuf_iterator(file)), {});
+        in.str(str);
     }
 
     bool incomment(false);
     bool infileinclusion(false);
-    ns::string newfilename;
+    std::string newfilename;
 
-    ns::string token;
+    std::string token;
     while (!(token = nexttoken(in)).empty())
     {
         if (incomment)
@@ -275,14 +260,14 @@ constexpr bool readtokens(ns::string filename, ns::string const &text = "")
                 incomment = false;
                 continue;
             }
-            if (token.find("$(") != ns::string::npos)
+            if (token.find("$(") != std::string::npos)
             {
-                ns::cerr << "Characters $( found in a comment" << ns::endl;
+                std::cerr << "Characters $( found in a comment" << std::endl;
                 return false;
             }
-            if (token.find("$)") != ns::string::npos)
+            if (token.find("$)") != std::string::npos)
             {
-                ns::cerr << "Characters $) found in a comment" << ns::endl;
+                std::cerr << "Characters $) found in a comment" << std::endl;
                 return false;
             }
             continue;
@@ -299,10 +284,10 @@ constexpr bool readtokens(ns::string filename, ns::string const &text = "")
         {
             if (newfilename.empty())
             {
-                if (token.find('$') != ns::string::npos)
+                if (token.find('$') != std::string::npos)
                 {
-                    ns::cerr << "Filename " << token << " contains a $"
-                              << ns::endl;
+                    std::cerr << "Filename " << token << " contains a $"
+                              << std::endl;
                     return false;
                 }
                 newfilename = token;
@@ -312,8 +297,8 @@ constexpr bool readtokens(ns::string filename, ns::string const &text = "")
             {
                 if (token != "$]")
                 {
-                    ns::cerr << "Didn't find closing file inclusion delimiter"
-                              << ns::endl;
+                    std::cerr << "Didn't find closing file inclusion delimiter"
+                              << std::endl;
                     return false;
                 }
 
@@ -341,19 +326,19 @@ constexpr bool readtokens(ns::string filename, ns::string const &text = "")
     if (!in.eof())
     {
         if (in.fail())
-            ns::cerr << "Error reading from " << filename << ns::endl;
+            std::cerr << "Error reading from " << filename << std::endl;
         return false;
     }
 
     if (incomment)
     {
-        ns::cerr << "Unclosed comment" << ns::endl;
+        std::cerr << "Unclosed comment" << std::endl;
         return false;
     }
 
     if (infileinclusion)
     {
-        ns::cerr << "Unfinished file inclusion command" << ns::endl;
+        std::cerr << "Unfinished file inclusion command" << std::endl;
         return false;
     }
 
@@ -365,14 +350,14 @@ constexpr bool readtokens(ns::string filename, ns::string const &text = "")
 // The Assertion is inserted into the assertions collection,
 // and is returned by reference.
 constexpr Assertion & constructassertion
-  (ns::string const label, Expression const & exp)
+  (std::string const label, Expression const & exp)
 {
     Assertion & assertion
-        (assertions.insert(ns::make_pair(label, Assertion())).first->second);
+        (assertions.insert(std::make_pair(label, Assertion())).first->second);
 
     assertion.expression = exp;
 
-    ns::set<ns::string> varsused;
+    std::set<std::string> varsused;
 
     // Determine variables used and find mandatory hypotheses
 
@@ -383,11 +368,11 @@ constexpr Assertion & constructassertion
             varsused.insert(*iter);
     }
 
-    for (ns::vector<Scope>::const_reverse_iterator iter(scopes.rbegin());
+    for (std::vector<Scope>::const_reverse_iterator iter(scopes.rbegin());
          iter != scopes.rend(); ++iter)
     {
-        ns::vector<ns::string> const & hypvec(iter->activehyp);
-        for (ns::vector<ns::string>::const_reverse_iterator iter2
+        std::vector<std::string> const & hypvec(iter->activehyp);
+        for (std::vector<std::string>::const_reverse_iterator iter2
             (hypvec.rbegin()); iter2 != hypvec.rend(); ++iter2)
         {
             Hypothesis const & hyp(hypotheses.find(*iter2)->second);
@@ -411,26 +396,26 @@ constexpr Assertion & constructassertion
     }
 
     // Determine mandatory disjoint variable restrictions
-    for (ns::vector<Scope>::const_iterator iter(scopes.begin());
+    for (std::vector<Scope>::const_iterator iter(scopes.begin());
          iter != scopes.end(); ++iter)
     {
-        ns::vector<ns::set<ns::string> > const & disjvars(iter->disjvars);
-        for (ns::vector<ns::set<ns::string> >::const_iterator iter2
+        std::vector<std::set<std::string> > const & disjvars(iter->disjvars);
+        for (std::vector<std::set<std::string> >::const_iterator iter2
             (disjvars.begin()); iter2 != disjvars.end(); ++iter2)
         {
-            ns::set<ns::string> dset;
-            ns::set_intersection
+            std::set<std::string> dset;
+            std::set_intersection
                  (iter2->begin(), iter2->end(),
                   varsused.begin(), varsused.end(),
-                  ns::inserter(dset, dset.end()));
+                  std::inserter(dset, dset.end()));
 
-            for (ns::set<ns::string>::const_iterator diter(dset.begin());
+            for (std::set<std::string>::const_iterator diter(dset.begin());
                  diter != dset.end(); ++diter)
             {
-                ns::set<ns::string>::const_iterator diter2(diter);
+                std::set<std::string>::const_iterator diter2(diter);
                 ++diter2;
                 for (; diter2 != dset.end(); ++diter2)
-                    assertion.disjvars.insert(ns::make_pair(*diter, *diter2));
+                    assertion.disjvars.insert(std::make_pair(*diter, *diter2));
             }
         }
     }
@@ -440,22 +425,22 @@ constexpr Assertion & constructassertion
 
 // Read an expression from the token stream. Returns true iff okay.
 constexpr bool readexpression
-    ( char stattype, ns::string label, ns::string terminator,
+    ( char stattype, std::string label, std::string terminator,
       Expression * exp)
 {
     if (tokens.empty())
     {
-        ns::cerr << "Unfinished $" << stattype << " statement " << label
-                  << ns::endl;
+        std::cerr << "Unfinished $" << stattype << " statement " << label
+                  << std::endl;
         return false;
     }
 
-    ns::string type(tokens.front());
+    std::string type(tokens.front());
 
     if (constants.find(type) == constants.end())
     {
-        ns::cerr << "First symbol in $" << stattype << " statement " << label
-                  << " is " << type << " which is not a constant" << ns::endl;
+        std::cerr << "First symbol in $" << stattype << " statement " << label
+                  << " is " << type << " which is not a constant" << std::endl;
         return false;
     }
 
@@ -463,7 +448,7 @@ constexpr bool readexpression
 
     exp->push_back(type);
 
-    ns::string token;
+    std::string token;
 
     while (!tokens.empty() && (token = tokens.front()) != terminator)
     {
@@ -472,10 +457,10 @@ constexpr bool readexpression
         if (constants.find(token) == constants.end()
          && getfloatinghyp(token).empty())
         {
-            ns::cerr << "In $" << stattype << " statement " << label
+            std::cerr << "In $" << stattype << " statement " << label
                       << " token " << token
                       << " found which is not a constant or variable in an"
-                         " active $f statement" << ns::endl;
+                         " active $f statement" << std::endl;
             return false;
         }
 
@@ -484,8 +469,8 @@ constexpr bool readexpression
 
     if (tokens.empty())
     {
-        ns::cerr << "Unfinished $" << stattype << " statement " << label
-                  << ns::endl;
+        std::cerr << "Unfinished $" << stattype << " statement " << label
+                  << std::endl;
         return false;
     }
 
@@ -497,14 +482,14 @@ constexpr bool readexpression
 // Make a substitution of variables. The result is put in "destination",
 // which should be empty.
 constexpr void makesubstitution
-    (Expression const & original, ns::map<ns::string, Expression> substmap,
+    (Expression const & original, std::map<std::string, Expression> substmap,
      Expression * destination
     )
 {
     for (Expression::const_iterator iter(original.begin());
          iter != original.end(); ++iter)
     {
-        ns::map<ns::string, Expression>::const_iterator const iter2
+        std::map<std::string, Expression>::const_iterator const iter2
             (substmap.find(*iter));
         if (iter2 == substmap.end())
         {
@@ -514,32 +499,32 @@ constexpr void makesubstitution
         else
         {
             // Variable
-            ns::copy(iter2->second.begin(), iter2->second.end(),
-                      ns::back_inserter(*destination));
+            std::copy(iter2->second.begin(), iter2->second.end(),
+                      std::back_inserter(*destination));
         }
     }
 }
 
 // Get the raw numbers from compressed proof format.
 // The letter Z is translated as 0.
-constexpr bool getproofnumbers(ns::string label, ns::string proof,
-                               ns::vector<ns::size_t> * proofnumbers)
+constexpr bool getproofnumbers(std::string label, std::string proof,
+                               std::vector<std::size_t> * proofnumbers)
 {
-    ns::size_t const size_max(ns::numeric_limits<ns::size_t>::max());
+    std::size_t const size_max(std::numeric_limits<std::size_t>::max());
 
-    ns::size_t num(0u);
+    std::size_t num(0u);
     bool justgotnum(false);
-    for (ns::string::const_iterator iter(proof.begin()); iter != proof.end();
+    for (std::string::const_iterator iter(proof.begin()); iter != proof.end();
          ++iter)
     {
         if (*iter <= 'T')
         {
-            ns::size_t const addval(*iter - ('A' - 1));
+            std::size_t const addval(*iter - ('A' - 1));
 
             if (num > size_max / 20 || 20 * num > size_max - addval)
             {
-                ns::cerr << "Overflow computing numbers in compressed proof "
-                             "of " << label << ns::endl;
+                std::cerr << "Overflow computing numbers in compressed proof "
+                             "of " << label << std::endl;
                 return false;
             }
 
@@ -549,12 +534,12 @@ constexpr bool getproofnumbers(ns::string label, ns::string proof,
         }
         else if (*iter <= 'Y')
         {
-            ns::size_t const addval(*iter - 'T');
+            std::size_t const addval(*iter - 'T');
 
             if (num > size_max / 5 || 5 * num > size_max - addval)
             {
-                ns::cerr << "Overflow computing numbers in compressed proof "
-                             "of " << label << ns::endl;
+                std::cerr << "Overflow computing numbers in compressed proof "
+                             "of " << label << std::endl;
                 return false;
             }
 
@@ -565,8 +550,8 @@ constexpr bool getproofnumbers(ns::string label, ns::string proof,
         {
             if (!justgotnum)
             {
-                ns::cerr << "Stray Z found in compressed proof of "
-                          << label << ns::endl;
+                std::cerr << "Stray Z found in compressed proof of "
+                          << label << std::endl;
                 return false;
             }
 
@@ -577,8 +562,8 @@ constexpr bool getproofnumbers(ns::string label, ns::string proof,
 
     if (num != 0)
     {
-        ns::cerr << "Compressed proof of theorem " << label
-                  << " ends in unfinished number" << ns::endl;
+        std::cerr << "Compressed proof of theorem " << label
+                  << " ends in unfinished number" << std::endl;
         return false;
     }
 
@@ -588,23 +573,23 @@ constexpr bool getproofnumbers(ns::string label, ns::string proof,
 // Subroutine for proof verification. Verify a proof step referencing an
 // assertion (i.e., not a hypothesis).
 constexpr bool verifyassertionref
-  (ns::string thlabel, ns::string reflabel, ns::vector<Expression> * stack)
+  (std::string thlabel, std::string reflabel, std::vector<Expression> * stack)
 {
     Assertion const & assertion(assertions.find(reflabel)->second);
     if (stack->size() < assertion.hypotheses.size())
     {
-        ns::cerr << "In proof of theorem " << thlabel
-                  << " not enough items found on stack" << ns::endl;
+        std::cerr << "In proof of theorem " << thlabel
+                  << " not enough items found on stack" << std::endl;
         return false;
     }
 
-    ns::vector<Expression>::size_type const base
+    std::vector<Expression>::size_type const base
         (stack->size() - assertion.hypotheses.size());
 
-    ns::map<ns::string, Expression> substitutions;
+    std::map<std::string, Expression> substitutions;
 
     // Determine substitutions and check that we can unify
-    for (ns::deque<ns::string>::size_type i(0);
+    for (std::deque<std::string>::size_type i(0);
          i < assertion.hypotheses.size(); ++i)
     {
         Hypothesis const & hypothesis
@@ -614,15 +599,15 @@ constexpr bool verifyassertionref
             // Floating hypothesis of the referenced assertion
             if (hypothesis.first[0] != (*stack)[base + i][0])
             {
-                ns::cout << "In proof of theorem " << thlabel
-                          << " unification failed" << ns::endl;
+                std::cout << "In proof of theorem " << thlabel
+                          << " unification failed" << std::endl;
                 return false;
             }
             Expression & subst(substitutions.insert
-                (ns::make_pair(hypothesis.first[1],
+                (std::make_pair(hypothesis.first[1],
                  Expression())).first->second);
-            ns::copy((*stack)[base + i].begin() + 1, (*stack)[base + i].end(),
-                      ns::back_inserter(subst));
+            std::copy((*stack)[base + i].begin() + 1, (*stack)[base + i].end(),
+                      std::back_inserter(subst));
         }
         else
         {
@@ -631,8 +616,8 @@ constexpr bool verifyassertionref
             makesubstitution(hypothesis.first, substitutions, &dest);
             if (dest != (*stack)[base + i])
             {
-                ns::cerr << "In proof of theorem "  << thlabel
-                          << " unification failed" << ns::endl;
+                std::cerr << "In proof of theorem "  << thlabel
+                          << " unification failed" << std::endl;
                 return false;
             }
         }
@@ -642,14 +627,14 @@ constexpr bool verifyassertionref
     stack->erase(stack->begin() + base, stack->end());
 
     // Verify disjoint variable conditions
-    for (ns::set<ns::pair<ns::string, ns::string> >::const_iterator
+    for (std::set<std::pair<std::string, std::string> >::const_iterator
          iter(assertion.disjvars.begin());
          iter != assertion.disjvars.end(); ++iter)
     {
         Expression const & exp1(substitutions.find(iter->first)->second);
         Expression const & exp2(substitutions.find(iter->second)->second);
 
-        ns::set<ns::string> exp1vars;
+        std::set<std::string> exp1vars;
         for (Expression::const_iterator exp1iter(exp1.begin());
              exp1iter != exp1.end(); ++exp1iter)
         {
@@ -657,7 +642,7 @@ constexpr bool verifyassertionref
                 exp1vars.insert(*exp1iter);
         }
 
-        ns::set<ns::string> exp2vars;
+        std::set<std::string> exp2vars;
         for (Expression::const_iterator exp2iter(exp2.begin());
              exp2iter != exp2.end(); ++exp2iter)
         {
@@ -665,17 +650,17 @@ constexpr bool verifyassertionref
                 exp2vars.insert(*exp2iter);
         }
 
-        for (ns::set<ns::string>::const_iterator exp1iter
+        for (std::set<std::string>::const_iterator exp1iter
             (exp1vars.begin()); exp1iter != exp1vars.end(); ++exp1iter)
         {
-            for (ns::set<ns::string>::const_iterator exp2iter
+            for (std::set<std::string>::const_iterator exp2iter
                 (exp2vars.begin()); exp2iter != exp2vars.end(); ++exp2iter)
             {
                 if (!isdvr(*exp1iter, *exp2iter))
                 {
-                    ns::cerr << "In proof of theorem " << thlabel
+                    std::cerr << "In proof of theorem " << thlabel
                               << " disjoint variable restriction violated"
-                              << ns::endl;
+                              << std::endl;
                     return false;
                 }
             }
@@ -693,16 +678,16 @@ constexpr bool verifyassertionref
 // Verify a regular proof. The "proof" argument should be a non-empty sequence
 // of valid labels. Return true iff the proof is correct.
 constexpr bool verifyregularproof
-     (ns::string label, Assertion const & theorem,
-      ns::vector<ns::string> const & proof
+     (std::string label, Assertion const & theorem,
+      std::vector<std::string> const & proof
      )
 {
-    ns::vector<Expression> stack;
-    for (ns::vector<ns::string>::const_iterator proofstep(proof.begin());
+    std::vector<Expression> stack;
+    for (std::vector<std::string>::const_iterator proofstep(proof.begin());
          proofstep != proof.end(); ++proofstep)
     {
         // If step is a hypothesis, just push it onto the stack.
-        ns::map<ns::string, Hypothesis>::const_iterator hyp
+        std::map<std::string, Hypothesis>::const_iterator hyp
             (hypotheses.find(*proofstep));
         if (hyp != hypotheses.end())
         {
@@ -718,16 +703,16 @@ constexpr bool verifyregularproof
 
     if (stack.size() != 1)
     {
-        ns::cerr << "Proof of theorem " << label
+        std::cerr << "Proof of theorem " << label
                   << " does not end with only one item on the stack"
-                  << ns::endl;
+                  << std::endl;
         return false;
     }
 
     if (stack[0] != theorem.expression)
     {
-        ns::cerr << "Proof of theorem " << label << " proves wrong statement"
-                  << ns::endl; 
+        std::cerr << "Proof of theorem " << label << " proves wrong statement"
+                  << std::endl; 
     }
 
     return true;
@@ -735,17 +720,17 @@ constexpr bool verifyregularproof
 
 // Verify a compressed proof
 constexpr bool verifycompressedproof
-    (ns::string label, Assertion const & theorem,
-     ns::vector<ns::string> const & labels,
-     ns::vector<ns::size_t> const & proofnumbers)
+    (std::string label, Assertion const & theorem,
+     std::vector<std::string> const & labels,
+     std::vector<std::size_t> const & proofnumbers)
 {
-    ns::vector<Expression> stack;
+    std::vector<Expression> stack;
 
-    ns::size_t const mandhypt(theorem.hypotheses.size());
-    ns::size_t const labelt(mandhypt + labels.size());
+    std::size_t const mandhypt(theorem.hypotheses.size());
+    std::size_t const labelt(mandhypt + labels.size());
 
-    ns::vector<Expression> savedsteps;
-    for (ns::vector<ns::size_t>::const_iterator iter(proofnumbers.begin());
+    std::vector<Expression> savedsteps;
+    for (std::vector<std::size_t>::const_iterator iter(proofnumbers.begin());
          iter != proofnumbers.end(); ++iter)
     {
         // Save the last proof step if 0
@@ -763,11 +748,11 @@ constexpr bool verifycompressedproof
         }
         else if (*iter <= labelt)
         {
-            ns::string const proofstep(labels[*iter - mandhypt - 1]);
+            std::string const proofstep(labels[*iter - mandhypt - 1]);
 
             // If step is a (non-mandatory) hypothesis,
             // just push it onto the stack.
-            ns::map<ns::string, Hypothesis>::const_iterator hyp
+            std::map<std::string, Hypothesis>::const_iterator hyp
             (hypotheses.find(proofstep));
             if (hyp != hypotheses.end())
             {
@@ -784,8 +769,8 @@ constexpr bool verifycompressedproof
         {
             if (*iter > labelt + savedsteps.size())
             {
-                ns::cerr << "Number in compressed proof of " << label
-                          << " is too high" << ns::endl;
+                std::cerr << "Number in compressed proof of " << label
+                          << " is too high" << std::endl;
                 return false;
             }
 
@@ -795,23 +780,23 @@ constexpr bool verifycompressedproof
 
     if (stack.size() != 1)
     {
-        ns::cerr << "Proof of theorem " << label
+        std::cerr << "Proof of theorem " << label
                   << " does not end with only one item on the stack"
-                  << ns::endl;
+                  << std::endl;
         return false;
     }
 
     if (stack[0] != theorem.expression)
     {
-        ns::cerr << "Proof of theorem " << label << " proves wrong statement"
-                  << ns::endl; 
+        std::cerr << "Proof of theorem " << label << " proves wrong statement"
+                  << std::endl; 
     }
 
     return true;
 }
 
 // Parse $p statement. Return true iff okay.
-constexpr bool parsep(ns::string label)
+constexpr bool parsep(std::string label)
 {
     Expression newtheorem;
     bool const okay(readexpression('p', label, "$=", &newtheorem));
@@ -826,7 +811,7 @@ constexpr bool parsep(ns::string label)
 
     if (tokens.empty())
     {
-        ns::cerr << "Unfinished $p statement " << label << ns::endl;
+        std::cerr << "Unfinished $p statement " << label << std::endl;
         return false;
     }
 
@@ -837,40 +822,40 @@ constexpr bool parsep(ns::string label)
 
         // Get labels
 
-        ns::vector<ns::string> labels;
-        ns::string token;
+        std::vector<std::string> labels;
+        std::string token;
         while (!tokens.empty() && (token = tokens.front()) != ")")
         {
             tokens.pop();
             labels.push_back(token);
             if (token == label)
             {
-                ns::cerr << "Proof of theorem " << label
-                          << " refers to itself" << ns::endl;
+                std::cerr << "Proof of theorem " << label
+                          << " refers to itself" << std::endl;
                 return false;
             }
-            else if (ns::find
+            else if (std::find
                     (assertion.hypotheses.begin(), assertion.hypotheses.end(),
                      token) != assertion.hypotheses.end())
             {
-                ns::cerr << "Compressed proof of theorem " << label
+                std::cerr << "Compressed proof of theorem " << label
                           << " has mandatory hypothesis " << token
-                          << " in label list" << ns::endl;
+                          << " in label list" << std::endl;
                 return false;
             }
             else if (assertions.find(token) == assertions.end()
                   && !isactivehyp(token))
             {
-                ns::cerr << "Proof of theorem " << label << " refers to "
+                std::cerr << "Proof of theorem " << label << " refers to "
                           << token << " which is not an active statement"
-                          << ns::endl;
+                          << std::endl;
                 return false;
             }
         }
 
         if (tokens.empty())
         {
-            ns::cerr << "Unfinished $p statement " << label << ns::endl;
+            std::cerr << "Unfinished $p statement " << label << std::endl;
             return false;
         }
 
@@ -878,7 +863,7 @@ constexpr bool parsep(ns::string label)
 
         // Get proof steps
 
-        ns::string proof;
+        std::string proof;
         while (!tokens.empty() && (token = tokens.front()) != "$.")
         {
             tokens.pop();
@@ -886,34 +871,34 @@ constexpr bool parsep(ns::string label)
             proof += token;
             if (!containsonlyupperorq(token))
             {
-                ns::cerr << "Bogus character found in compressed proof of "
-                          << label << ns::endl;
+                std::cerr << "Bogus character found in compressed proof of "
+                          << label << std::endl;
                 return false;
             }
         }
 
         if (tokens.empty())
         {
-            ns::cerr << "Unfinished $p statement " << label << ns::endl;
+            std::cerr << "Unfinished $p statement " << label << std::endl;
             return false;
         }
 
         if (proof.empty())
         {
-            ns::cerr << "Theorem " << label << " has no proof" << ns::endl;
+            std::cerr << "Theorem " << label << " has no proof" << std::endl;
             return false;
         }
 
         tokens.pop(); // Discard $. token
 
-        if (proof.find('?') != ns::string::npos)
+        if (proof.find('?') != std::string::npos)
         {
-            ns::cerr << "Warning: Proof of theorem " << label
-                      << " is incomplete" << ns::endl;
+            std::cerr << "Warning: Proof of theorem " << label
+                      << " is incomplete" << std::endl;
             return true; // Continue processing file
         }
 
-        ns::vector<ns::size_t> proofnumbers;
+        std::vector<std::size_t> proofnumbers;
         proofnumbers.reserve(proof.size()); // Preallocate for efficiency
         bool okay(getproofnumbers(label, proof, &proofnumbers));
         if (!okay)
@@ -926,9 +911,9 @@ constexpr bool parsep(ns::string label)
     else
     {
         // Regular (uncompressed proof)
-        ns::vector<ns::string> proof;
+        std::vector<std::string> proof;
         bool incomplete(false);
-        ns::string token;
+        std::string token;
         while (!tokens.empty() && (token = tokens.front()) != "$.")
         {
             tokens.pop();
@@ -937,29 +922,29 @@ constexpr bool parsep(ns::string label)
                 incomplete = true;
             else if (token == label)
             {
-                ns::cerr << "Proof of theorem " << label
-                          << " refers to itself" << ns::endl;
+                std::cerr << "Proof of theorem " << label
+                          << " refers to itself" << std::endl;
                 return false;
             }
             else if (assertions.find(token) == assertions.end()
                   && !isactivehyp(token))
             {
-                ns::cerr << "Proof of theorem " << label << " refers to "
+                std::cerr << "Proof of theorem " << label << " refers to "
                           << token << " which is not an active statement"
-                          << ns::endl;
+                          << std::endl;
                 return false;
             }
         }
 
         if (tokens.empty())
         {
-            ns::cerr << "Unfinished $p statement " << label << ns::endl;
+            std::cerr << "Unfinished $p statement " << label << std::endl;
             return false;
         }
 
         if (proof.empty())
         {
-            ns::cerr << "Theorem " << label << " has no proof" << ns::endl;
+            std::cerr << "Theorem " << label << " has no proof" << std::endl;
             return false;
         }
 
@@ -967,8 +952,8 @@ constexpr bool parsep(ns::string label)
 
         if (incomplete)
         {
-            ns::cerr << "Warning: Proof of theorem " << label
-                      << " is incomplete" << ns::endl;
+            std::cerr << "Warning: Proof of theorem " << label
+                      << " is incomplete" << std::endl;
             return true; // Continue processing file
         }
 
@@ -981,7 +966,7 @@ constexpr bool parsep(ns::string label)
 }
 
 // Parse $e statement. Return true iff okay.
-constexpr bool parsee(ns::string label)
+constexpr bool parsee(std::string label)
 {
     Expression newhyp;
     bool const okay(readexpression('e', label, "$.", &newhyp));
@@ -991,14 +976,14 @@ constexpr bool parsee(ns::string label)
     }
 
     // Create new essential hypothesis
-    hypotheses.insert(ns::make_pair(label, ns::make_pair(newhyp, false)));
+    hypotheses.insert(std::make_pair(label, std::make_pair(newhyp, false)));
     scopes.back().activehyp.push_back(label);
 
     return true;
 }
 
 // Parse $a statement. Return true iff okay.
-constexpr bool parsea(ns::string label)
+constexpr bool parsea(std::string label)
 {
     Expression newaxiom;
     bool const okay(readexpression('a', label, "$.", &newaxiom));
@@ -1013,20 +998,20 @@ constexpr bool parsea(ns::string label)
 }
 
 // Parse $f statement. Return true iff okay.
-constexpr bool parsef(ns::string label)
+constexpr bool parsef(std::string label)
 {
     if (tokens.empty())
     {
-        ns::cerr << "Unfinished $f statement" << label << ns::endl;
+        std::cerr << "Unfinished $f statement" << label << std::endl;
         return false;
     }
 
-    ns::string type(tokens.front());
+    std::string type(tokens.front());
 
     if (constants.find(type) == constants.end())
     {
-        ns::cerr << "First symbol in $f statement " << label << " is "
-                  << type << " which is not a constant" << ns::endl;
+        std::cerr << "First symbol in $f statement " << label << " is "
+                  << type << " which is not a constant" << std::endl;
         return false;
     }
 
@@ -1034,23 +1019,23 @@ constexpr bool parsef(ns::string label)
 
     if (tokens.empty())
     {
-        ns::cerr << "Unfinished $f statement " << label << ns::endl;
+        std::cerr << "Unfinished $f statement " << label << std::endl;
         return false;
     }
 
-    ns::string variable(tokens.front());
+    std::string variable(tokens.front());
     if (!isactivevariable(variable))
     {
-        ns::cerr << "Second symbol in $f statement " << label << " is "
+        std::cerr << "Second symbol in $f statement " << label << " is "
                   << variable << " which is not an active variable"
-                  << ns::endl;
+                  << std::endl;
         return false;
     }
     if (!getfloatinghyp(variable).empty())
     {
-        ns::cerr << "The variable " << variable
+        std::cerr << "The variable " << variable
                   << " appears in a second $f statement "
-                  << label << ns::endl;
+                  << label << std::endl;
         return false;
     }
 
@@ -1058,14 +1043,14 @@ constexpr bool parsef(ns::string label)
 
     if (tokens.empty())
     {
-        ns::cerr << "Unfinished $f statement" << label << ns::endl;
+        std::cerr << "Unfinished $f statement" << label << std::endl;
         return false;
     }
 
     if (tokens.front() != "$.")
     {
-        ns::cerr << "Expected end of $f statement " << label
-                  << " but found " << tokens.front() << ns::endl;
+        std::cerr << "Expected end of $f statement " << label
+                  << " but found " << tokens.front() << std::endl;
         return false;
     }
 
@@ -1075,43 +1060,43 @@ constexpr bool parsef(ns::string label)
     Expression newhyp;
     newhyp.push_back(type);
     newhyp.push_back(variable);
-    hypotheses.insert(ns::make_pair(label, ns::make_pair(newhyp, true)));
+    hypotheses.insert(std::make_pair(label, std::make_pair(newhyp, true)));
     scopes.back().activehyp.push_back(label);
-    scopes.back().floatinghyp.insert(ns::make_pair(variable, label));
+    scopes.back().floatinghyp.insert(std::make_pair(variable, label));
 
     return true;
 }
 
 // Parse labeled statement. Return true iff okay.
-constexpr bool parselabel(ns::string label)
+constexpr bool parselabel(std::string label)
 {
     if (constants.find(label) != constants.end())
     {
-        ns::cerr << "Attempt to reuse constant " << label << " as a label"
-                  << ns::endl;
+        std::cerr << "Attempt to reuse constant " << label << " as a label"
+                  << std::endl;
         return false;
     }
 
     if (variables.find(label) != variables.end())
     {
-        ns::cerr << "Attempt to reuse variable " << label << " as a label"
-                  << ns::endl;
+        std::cerr << "Attempt to reuse variable " << label << " as a label"
+                  << std::endl;
         return false;
     }
 
     if (labelused(label))
     {
-        ns::cerr << "Attempt to reuse label " << label << ns::endl;
+        std::cerr << "Attempt to reuse label " << label << std::endl;
         return false;
     }
 
     if (tokens.empty())
     {
-        ns::cerr << "Unfinished labeled statement" << ns::endl;
+        std::cerr << "Unfinished labeled statement" << std::endl;
         return false;
     }
 
-    ns::string const type(tokens.front());
+    std::string const type(tokens.front());
     tokens.pop();
 
     bool okay(true);
@@ -1133,8 +1118,8 @@ constexpr bool parselabel(ns::string label)
     }
     else
     {
-        ns::cerr << "Unexpected token " << type << " encountered"
-                  << ns::endl;
+        std::cerr << "Unexpected token " << type << " encountered"
+                  << std::endl;
         return false;
     }
 
@@ -1144,9 +1129,9 @@ constexpr bool parselabel(ns::string label)
 // Parse $d statement. Return true iff okay.
 constexpr bool parsed()
 {
-    ns::set<ns::string> dvars;
+    std::set<std::string> dvars;
 
-    ns::string token;
+    std::string token;
 
     while (!tokens.empty() && (token = tokens.front()) != "$.")
     {
@@ -1154,29 +1139,29 @@ constexpr bool parsed()
 
         if (!isactivevariable(token))
         {
-            ns::cerr << "Token " << token << " is not an active variable, "
-                      << "but was found in a $d statement" << ns::endl;
+            std::cerr << "Token " << token << " is not an active variable, "
+                      << "but was found in a $d statement" << std::endl;
             return false;
         }
 
         bool const duplicate(!dvars.insert(token).second);
         if (duplicate)
         {
-            ns::cerr << "$d statement mentions " << token << " twice"
-                      << ns::endl;
+            std::cerr << "$d statement mentions " << token << " twice"
+                      << std::endl;
             return false;
         }
     }
 
     if (tokens.empty())
     {
-        ns::cerr << "Unterminated $d statement" << ns::endl;
+        std::cerr << "Unterminated $d statement" << std::endl;
         return false;
     }
 
     if (dvars.size() < 2)
     {
-        ns::cerr << "Not enough items in $d statement" << ns::endl;
+        std::cerr << "Not enough items in $d statement" << std::endl;
         return false;
     }
 
@@ -1193,54 +1178,54 @@ constexpr bool parsec()
 {
     if (scopes.size() > 1)
     {
-        ns::cerr << "$c statement occurs in inner block"
-                  << ns::endl;
+        std::cerr << "$c statement occurs in inner block"
+                  << std::endl;
         return false;
     }
 
-    ns::string token;
+    std::string token;
     bool listempty(true);
     while (!tokens.empty() && (token = tokens.front()) != "$.")
-    { 
+    {
         tokens.pop();
         listempty = false;
 
         if (!ismathsymboltoken(token))
         {
-            ns::cerr << "Attempt to declare " << token
-                      << " as a constant" << ns::endl;
+            std::cerr << "Attempt to declare " << token
+                      << " as a constant" << std::endl;
             return false;
         }
         if (variables.find(token) != variables.end())
         {
-            ns::cerr << "Attempt to redeclare variable " << token
-                      << " as a constant" << ns::endl;
+            std::cerr << "Attempt to redeclare variable " << token
+                      << " as a constant" << std::endl;
             return false;
         }
         if (labelused(token))
         {
-            ns::cerr << "Attempt to reuse label " << token
-                      << " as a constant" << ns::endl;
+            std::cerr << "Attempt to reuse label " << token
+                      << " as a constant" << std::endl;
             return false;
         }
         bool const alreadydeclared(!constants.insert(token).second);
         if (alreadydeclared)
         {
-            ns::cerr << "Attempt to redeclare constant " << token
-                      << ns::endl;
+            std::cerr << "Attempt to redeclare constant " << token
+                      << std::endl;
             return false;
         }
     }
 
     if (tokens.empty())
     {
-        ns::cerr << "Unterminated $c statement" << ns::endl;
+        std::cerr << "Unterminated $c statement" << std::endl;
         return false;
     }
 
     if (listempty)
     {
-        ns::cerr << "Empty $c statement" << ns::endl;
+        std::cerr << "Empty $c statement" << std::endl;
         return false;
     }
 
@@ -1252,36 +1237,36 @@ constexpr bool parsec()
 // Parse $v statement. Return true iff okay.
 constexpr bool parsev()
 {
-    ns::string token;
+    std::string token;
     bool listempty(true);
     while (!tokens.empty() && (token = tokens.front()) != "$.")
-    { 
+    {
         tokens.pop();
         listempty = false;
 
         if (!ismathsymboltoken(token))
         {
-            ns::cerr << "Attempt to declare " << token
-                      << " as a variable" << ns::endl;
+            std::cerr << "Attempt to declare " << token
+                      << " as a variable" << std::endl;
             return false;
         }
         if (constants.find(token) != constants.end())
         {
-            ns::cerr << "Attempt to redeclare constant " << token
-                      << " as a variable" << ns::endl;
+            std::cerr << "Attempt to redeclare constant " << token
+                      << " as a variable" << std::endl;
             return false;
         }
         if (labelused(token))
         {
-            ns::cerr << "Attempt to reuse label " << token
-                      << " as a variable" << ns::endl;
+            std::cerr << "Attempt to reuse label " << token
+                      << " as a variable" << std::endl;
             return false;
         }
         bool const alreadyactive(isactivevariable(token));
         if (alreadyactive)
         {
-            ns::cerr << "Attempt to redeclare active variable " << token
-                      << ns::endl;
+            std::cerr << "Attempt to redeclare active variable " << token
+                      << std::endl;
             return false;
         }
         variables.insert(token);
@@ -1290,13 +1275,13 @@ constexpr bool parsev()
 
     if (tokens.empty())
     {
-        ns::cerr << "Unterminated $v statement" << ns::endl;
+        std::cerr << "Unterminated $v statement" << std::endl;
         return false;
     }
 
     if (listempty)
     {
-        ns::cerr << "Empty $v statement" << ns::endl;
+        std::cerr << "Empty $v statement" << std::endl;
         return false;
     }
 
@@ -1305,7 +1290,7 @@ constexpr bool parsev()
     return true;
 }
 
-constexpr int run(ns::string const filename, ns::string const &text = "")
+constexpr int run(std::string const filename, std::string const &text = "")
 {
     bool const okay(readtokens(filename, text));
     if (!okay)
@@ -1315,7 +1300,7 @@ constexpr int run(ns::string const filename, ns::string const &text = "")
 
     while (!tokens.empty())
     {
-        ns::string const token(tokens.front());
+        std::string const token(tokens.front());
         tokens.pop();
 
         bool okay(true);
@@ -1337,7 +1322,7 @@ constexpr int run(ns::string const filename, ns::string const &text = "")
             scopes.pop_back();
             if (scopes.empty())
             {
-                ns::cerr << "$} without corresponding ${" << ns::endl;
+                std::cerr << "$} without corresponding ${" << std::endl;
                 return EXIT_FAILURE;
             }
         }
@@ -1351,8 +1336,8 @@ constexpr int run(ns::string const filename, ns::string const &text = "")
         }
         else
         {
-            ns::cerr << "Unexpected token " << token << " encountered"
-                      << ns::endl;
+            std::cerr << "Unexpected token " << token << " encountered"
+                      << std::endl;
             return EXIT_FAILURE;
         }
         if (!okay)
@@ -1361,7 +1346,7 @@ constexpr int run(ns::string const filename, ns::string const &text = "")
 
     if (scopes.size() > 1)
     {
-        ns::cerr << "${ without corresponding $}" << ns::endl;
+        std::cerr << "${ without corresponding $}" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -1376,13 +1361,13 @@ constexpr int run(ns::string const filename, ns::string const &text = "")
 constexpr int app_run()
 {
     checkmm app;
-//    ns::string txt = R"($( Declare the constant symbols we will use $)
+//    std::string txt = R"($( Declare the constant symbols we will use $)
 //                        $c 0 + = -> ( ) term wff |- $.)";
-//    ns::string txt = "$c 0 + = -> ( ) term wff |- $.";
-//    ns::string txt = "$( The comment is not closed!";
+//    std::string txt = "$c 0 + = -> ( ) term wff |- $.";
+//    std::string txt = "$( The comment is not closed!";
 
 #ifdef MMFILEPATH
-    ns::string txt =
+    std::string txt =
 #include xstr(MMFILEPATH)
 ;
     int ret = app.run("", txt);
@@ -1397,7 +1382,7 @@ int main(int argc, char ** argv)
 {
     if (argc != 2)
     {
-        ns::cerr << "Syntax: checkmm <filename>" << ns::endl;
+        std::cerr << "Syntax: checkmm <filename>" << std::endl;
         return EXIT_FAILURE;
     }
 

@@ -5,12 +5,12 @@ compile-time using the [C'est](https://github.com/pkeir/cest) library.
 ## Differences to the Original
 
 1. Added the `constexpr` qualifier to all subroutines;
-2. Changed all functions, to member functions (methods) of a trivial struct (called `checkmm`). Global variables cannot be modified at compile-time;
-3. Changed the static variable `names` within `readtokens` to a class member of `checkmm`. Static variables are not permitted in `constexpr` functions;
-4. `constexpr` file IO is not possible, and `readtokens` now accepts a second string parameter, which is used if it isn't empty;
-5. File-includes within mm database files are not supported when processing at compile-time. An error is issued if this occurs;
-6. Headers included are from the cest library, so `#include "cest/vector.hpp"` rather than `#include <vector>` etc.
-7. Rather than replace names qualified `std::` with `cest::`, a namespace alias `ns` is used throughout; declared at global scope, and set to `cest` by default.
+2. Changed all functions, to member functions (methods) of a trivial struct (called `checkmm`). Global variables (including constexpr ones) cannot be modified at compile-time;
+3. Changed the static variable `names` within `readtokens` to a class member of `checkmm`. While `constexpr` static variables are now permitted in `constexpr` functions, they are constant, and `names` needs to be modified;
+4. `constexpr` file IO is not possible, and `readtokens` now accepts a second string parameter, which is used if it isn't empty. An std::istringstream (from C'est 2) is then used to feed `nexttoken`, rather than an std::ifstream. P2448 from C++23 also allows non-constexpr file IO, when not on the control path taken by the constexpr evaluator;
+5. File-includes within mm database files are not supported when processing at compile-time. An exception is thrown if this occurs;
+**rem** 6. Headers included are from the cest library, so `#include "cest/vector.hpp"` rather than `#include <vector>` etc.
+**rem** 7. Rather than replace names qualified `std::` with `cest::`, a namespace alias `ns` is used throughout; declared at global scope, and set to `cest` by default.
 8. A macro system is leveraged, where a pair of C++11-style raw string literal delimiters are placed before and after the original contents of a file. The `delimit.sh` bash script is provided to help with this. To use this approach, set the preprocessor macro `MMFILEPATH` to the script's output, during compilation of `ctcheckmm.cpp` (e.g. `-DMMFILEPATH=miu.mm.raw`).
 
 ## In Practise
